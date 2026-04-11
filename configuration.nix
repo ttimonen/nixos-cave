@@ -3,7 +3,7 @@
 # This is your system's configuration file.
 # Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 {
-  # inputs,
+  inputs,
   # lib,
   # config,
   pkgs,
@@ -50,9 +50,16 @@
 
   nixpkgs.hostPlatform = "x86_64-linux";
   networking.hostName = "cave";
-  nix.settings = {
-    substituters = [
-	"ssh://hopihe?remote-program=/root/.nix-profile/bin/nix-store&trusted=1"
-    ];
+  nix = {
+    settings.substituters = [ "ssh://hopihe?remote-program=/root/.nix-profile/bin/nix-store&trusted=1" ];
+    # This will add each flake input to the registry
+    # Making 'nix run nixpkgs#hello' use the same revision as your system
+    registry = {
+      nixpkgs.flake = inputs.nixpkgs;
+    };
+
+    # Optional: This adds the inputs to your system's legacy @nix-path
+    # Useful for making <nixpkgs> work in non-flake commands
+    nixPath = [ "nixpkgs=${inputs.nixpkgs.outPath}" ];
   };
 }
