@@ -27,7 +27,7 @@
 
   # Search for additional packages here: https://search.nixos.org/packages
   environment.systemPackages = with pkgs; [
-    neovim
+    vim
     git
   ];
 
@@ -47,4 +47,12 @@
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "25.11";
+
+  nixpkgs.hostPlatform = "x86_64-linux";
+  networking.hostName = "cave";
+  nix.settings = {
+    substituters = [
+	"ssh://hopihe?remote-program=/root/.nix-profile/bin/nix-store&trusted=1"
+    ];
+  };
 }
