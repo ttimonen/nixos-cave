@@ -6,7 +6,7 @@
     nixos-crostini.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixos-crostini }:
+  outputs = { self, nixpkgs, nixos-crostini }@inputs:
     let
       modules = [
         # This is your configuration.
@@ -19,13 +19,16 @@
     # This allows you to rebuild while running inside the LXC container.
     # Change to your hostname.
     nixosConfigurations.cave = nixpkgs.lib.nixosSystem {
-      modules = modules; };
+      specialArgs = { inherit inputs; };
+      modules = modules;
+    };
 
     # This will allow you to build the image from another host.
     packages = rec {
           lxc = nixos-crostini.inputs.nixos-generators.nixosGenerate {
             inherit modules;
-	    system = "x86_64-linux";
+            specialArgs = { inherit inputs; };
+            system = "x86_64-linux";
             format = "lxc";
           };
           lxc-metadata = nixos-crostini.inputs.nixos-generators.nixosGenerate {
