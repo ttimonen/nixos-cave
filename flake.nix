@@ -6,10 +6,8 @@
     nixos-crostini.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixos-crostini }: {
-    # This allows you to rebuild while running inside the LXC container.
-    # Change to your hostname.
-    nixosConfigurations.cave = nixpkgs.lib.nixosSystem {
+  outputs = { self, nixpkgs, nixos-crostini }:
+    let
       modules = [
         # This is your configuration.
         ./configuration.nix
@@ -17,10 +15,37 @@
         # Here is where it gets added to the modules.
         nixos-crostini.nixosModules.default
       ];
-    };
+    in {
+    # This allows you to rebuild while running inside the LXC container.
+    # Change to your hostname.
+    nixosConfigurations.cave = nixpkgs.lib.nixosSystem {
+      modules = modules; };
 
     # This will allow you to build the image from another host.
-    packages.x86_64-linux.lxc-image-and-metadata = nixos-crostini.packages.x86_64-linux.default;
+    packages = rec {
+          lxc = nixos-crostini.inputs.nixos-generators.nixosGenerate {
+            inherit modules;
+	    system = "x86_64-linux";
+            format = "lxc";
+          };
+          lxc-metadata = nixos-crostini.inputs.nixos-generators.nixosGenerate {
+            inherit modules;
+	    system = "x86_64-linux";
+            format = "lxc-metadata";
+          };
+
+          x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.stdenv.mkDerivation {
+            name = "lxc-image-and-metadata";
+            dontUnpack = true;
+
+            installPhase = ''
+              mkdir -p $out
+              ln -s ${lxc-metadata}/tarball/*.tar.xz $out/metadata.tar.xz
+              ln -s ${lxc}/tarball/*.tar.xz $out/image.tar.xz
+            '';
+          };
+        };
+
   };
 }
 
