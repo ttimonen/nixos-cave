@@ -62,7 +62,11 @@
        pkgs = nixpkgs.legacyPackages.x86_64-linux;
        modules = [ ./homes/toni.nix ];
      };
-   };
+     ttimonen = home-manager.lib.homeManagerConfiguration {
+       pkgs = nixpkgs.legacyPackages.x86_64-linux;
+       modules = [ ./homes/ttimonen.nix ];
+     };
+    };
  };
 }
 
