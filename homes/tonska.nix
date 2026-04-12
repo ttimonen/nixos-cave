@@ -6,12 +6,23 @@
 	settings.user.email = "toni.timonen@iki.fi";
   };
 
-  programs.bash.enable = true;
-  programs.fish.enable = true;
-  programs.nushell.enable = true;
-  programs.vim = {
-    enable = true;
-    defaultEditor = true;
+  programs = {
+    bash.enable = true;
+    fish.enable = true;
+    nushell.enable = true;
+    vim = {
+      enable = true;
+      defaultEditor = true;
+    };
+    starship = {
+      enable = true;
+      enableTransience = true;
+      settings = {
+        add_newline = false;
+        nix_shell.heuristic = true;
+        shell.disabled = false;
+      };
+    };
   };
 
 
