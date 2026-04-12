@@ -4,9 +4,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos-crostini.url = "github:aldur/nixos-crostini";
     nixos-crostini.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager = {
+      url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixos-crostini }@inputs:
+  outputs = { self, nixpkgs, nixos-crostini, home-manager }@inputs:
     let
       modules = [
         # This is your configuration.
@@ -49,6 +53,16 @@
           };
         };
 
-  };
+
+   # Entrypoint for home directory management
+   # This could be a separate flake.nix in a subdirectory, since it's independent from the rest.
+   # Install with home-manager --flake .#toni
+   homeConfigurations = {
+     toni = home-manager.lib.homeManagerConfiguration {
+       pkgs = nixpkgs.legacyPackages.x86_64-linux;
+       modules = [ ./homes/toni.nix ];
+     };
+   };
+ };
 }
 
